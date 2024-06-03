@@ -1,0 +1,5 @@
+{
+  "name": "react-three-no-fiber",
+  "description": "Starter project for theejs app in react without using react-three-fiber",
+  "default": "react"
+}
