@@ -4,7 +4,6 @@ import {
   PerspectiveCamera,
   Scene,
   WebGLRenderer,
-  Vector3,
 } from "three";
 import { createCamera } from "./Components/PerspectiveCamera";
 import createRenderer from "./System/Renderer";
@@ -15,6 +14,8 @@ import {
   createOrbitControls,
   OrbitController,
 } from "./Components/OrbitController";
+
+import { CreateBaseCube } from "./Components/StarterCube";
 
 //----------------------Settings---------------------
 
@@ -39,14 +40,9 @@ class World {
     //Helpers
     const axesHelper = new AxesHelper(10);
     this.scene.add(axesHelper);
-
-    //---------------------Test 3D translation for l-system drawing------------
-    // const angle = 25;
-    // const origin = new Vector3(0, 0, 0);
-    // const newX = Math.cos(angle) + origin.x;
-    // const newY = Math.sin(angle) + origin.y;
-    // const newZ = origin.z;
-    // const newPoint = new PointerEvent();
+    const starterCube = CreateBaseCube();
+    starterCube.position.set(0, 0, 0);
+    this.scene.add(starterCube);
   }
 
   render() {
