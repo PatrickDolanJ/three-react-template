@@ -1,10 +1,9 @@
 import { WebGLRenderer } from "three";
-
-function createRenderer() {
-  const renderer = new WebGLRenderer({ antialias: true, precision: "highp" });
-  renderer.useLegacyLights = true;
-
-  return renderer;
+class BasicRenderer extends WebGLRenderer {
+  constructor(container: HTMLElement) {
+    super({ antialias: true, precision: "highp" });
+    container.append(this.domElement);
+  }
 }
 
-export default createRenderer;
+export { BasicRenderer };

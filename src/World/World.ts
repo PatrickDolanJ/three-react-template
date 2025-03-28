@@ -1,52 +1,42 @@
-import {
-  AxesHelper,
-  Camera,
-  PerspectiveCamera,
-  Scene,
-  WebGLRenderer,
-} from "three";
-import { createCamera } from "./Components/PerspectiveCamera";
-import createRenderer from "./System/Renderer";
-import { createScene } from "./Components/Scene";
+import { AxesHelper, Camera, Scene, WebGLRenderer } from "three";
+import { BasicCamera } from "./Components/PerspectiveCamera";
+import { BasicRenderer } from "./System/Renderer";
+import { BasicScene } from "./Components/Scene";
 import { Loop } from "./System/Loop";
 import { Resizer } from "./System/Resizer";
-import {
-  createOrbitControls,
-  OrbitController,
-} from "./Components/OrbitController";
-
-import { CreateBaseCube } from "./Components/StarterCube";
+import { OrbitController } from "./Components/OrbitController";
+import { OrbitControls } from "three/examples/jsm/Addons.js";
+import { StarterCube } from "./Components/StarterCube";
 
 //----------------------Settings---------------------
 
 class World {
   scene: Scene;
-  camera: PerspectiveCamera | Camera;
+  camera: Camera;
   renderer: WebGLRenderer;
   loop: Loop;
-  orbitController: OrbitController;
+  orbitController?: OrbitControls;
   resizer: Resizer;
 
   constructor(container: HTMLElement) {
-    //setup basic three components
-    this.scene = createScene();
-    this.camera = createCamera(container);
-    this.renderer = createRenderer();
-    container.append(this.renderer.domElement);
+    //Setup core
+    this.scene = new BasicScene();
+    this.camera = new BasicCamera(container);
+    this.renderer = new BasicRenderer(container);
     this.loop = new Loop(this.camera, this.scene, this.renderer);
-    this.orbitController = createOrbitControls(this.camera, container);
+    this.orbitController = new OrbitController(this.camera, container);
     this.resizer = new Resizer(container, this.camera, this.renderer);
 
     //Helpers
     const axesHelper = new AxesHelper(10);
     this.scene.add(axesHelper);
-    const starterCube = CreateBaseCube();
-    starterCube.position.set(0, 0, 0);
-    this.scene.add(starterCube);
-  }
 
-  render() {
-    this.renderer.render(this.scene, this.camera);
+    // Basic Mesh with custom shader
+    const starterCube = new StarterCube(5, 5, 1);
+    starterCube.position.set(0, 0, 0);
+    this.loop.addClickable(starterCube);
+    this.loop.addUpdateable(starterCube);
+    this.scene.add(starterCube);
   }
 
   start() {
