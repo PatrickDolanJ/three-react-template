@@ -5,7 +5,6 @@ import {
   ShaderPass,
   DotScreenShader,
   RGBShiftShader,
-  OutputPass,
   RenderPixelatedPass,
 } from "three/examples/jsm/Addons.js";
 import { BasicCamera } from "./Components/PerspectiveCamera";
@@ -16,6 +15,7 @@ import { Resizer } from "./System/Resizer";
 import { OrbitController } from "./Components/OrbitController";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
 import { StarterCube } from "./Components/StarterCube";
+import { BasicShaderPass } from "./PostProcessing/Basic/BasicPostProcessingShader";
 
 //----------------------Settings---------------------
 
@@ -56,21 +56,23 @@ class World {
     this.scene.add(starterCube);
 
     //Post Processing
-    // this.composer.addPass(new RenderPass(this.scene, this.camera));
-    // const effect1 = new ShaderPass(DotScreenShader);
-    // effect1.uniforms["scale"].value = 4.3;
-    // this.composer.addPass(effect1);
-
-    // const effect2 = new ShaderPass(RGBShiftShader);
-    // effect2.uniforms["amount"].value = 0.005;
-    // this.composer.addPass(effect2);
-
-    // const effect3 = new OutputPass();
-    // this.composer.addPass(effect3);
+    this.composer.addPass(new RenderPass(this.scene, this.camera));
 
     const effect4 = new RenderPixelatedPass(10, this.scene, this.camera);
-
     this.composer.addPass(effect4);
+
+    const effect1 = new ShaderPass(DotScreenShader);
+    effect1.uniforms["scale"].value = 4.3;
+    this.composer.addPass(effect1);
+    console.log(effect1);
+
+    const effect2 = new ShaderPass(RGBShiftShader);
+    effect2.uniforms["amount"].value = 0.005;
+    this.composer.addPass(effect2);
+
+    const effectCustom = new BasicShaderPass();
+    console.log(effectCustom);
+    this.composer.addPass(effectCustom);
   }
 
   start() {
