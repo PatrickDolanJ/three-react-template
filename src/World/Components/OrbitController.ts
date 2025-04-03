@@ -9,6 +9,7 @@ class OrbitController extends OrbitControls implements Updateable {
     super(camera, domElement);
     this.autoRotateSpeed = 1.0;
     this.uuid = generateUUID();
+    this.enablePan = false;
   }
 
   override update(): boolean {

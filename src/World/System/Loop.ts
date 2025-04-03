@@ -11,6 +11,7 @@ import {
   Object3DEventMap,
   Layers as _LAYERS,
 } from "three";
+import { EffectComposer } from "three/examples/jsm/Addons.js";
 import { clamp } from "three/src/math/MathUtils.js";
 
 const clock = new Clock();
@@ -73,11 +74,13 @@ class Loop {
   maxInterval: number;
   fixedTimeInterval: number;
   isFixedTimeInterval: boolean;
+  composer: EffectComposer;
 
   constructor(
     camera: PerspectiveCamera | Camera,
     scene: Scene,
     renderer: WebGLRenderer,
+    composer: EffectComposer,
     maxInterval: number = 0.01,
     fixedTimeInterval: number = 0.01,
     isFixedTimeInterval: boolean = false
@@ -85,6 +88,7 @@ class Loop {
     this.camera = camera;
     this.scene = scene;
     this.renderer = renderer;
+    this.composer = composer;
     this.maxInterval = maxInterval;
     this.fixedTimeInterval = fixedTimeInterval;
     this.isFixedTimeInterval = isFixedTimeInterval;
@@ -109,6 +113,7 @@ class Loop {
     this.renderer.setAnimationLoop(() => {
       this.update();
       this.renderer.render(this.scene, this.camera);
+      // this.composer.render();
     });
   }
 

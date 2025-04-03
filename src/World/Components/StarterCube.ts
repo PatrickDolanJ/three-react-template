@@ -1,5 +1,5 @@
 import { Mesh, BoxGeometry } from "three";
-import { BasicShaderMat } from "../Shaders/BasicShader/BasicShader";
+import { BasicMat } from "../Materials/BasicMaterial/BasicMaterial";
 import {
   Clickable,
   Hoverable,
@@ -17,16 +17,16 @@ class StarterCube extends Mesh implements Hoverable, Clickable, Updateable {
   ) {
     super(
       new BoxGeometry(width, height, depth, widthSegments, heightSegments),
-      BasicShaderMat
+      BasicMat
     );
   }
 
   onHover(data: IntersectionData) {
-    console.log("Distance to Startercube(HOVER): " + data.distance);
+    console.log("Distance to Startercube (HOVER): " + data.distance);
   }
 
   onClick(data: IntersectionData) {
-    console.log("Distance to Startercube(CLICK): " + data.distance);
+    console.log("Distance to Startercube (CLICK): " + data.distance);
   }
   update() {
     this.position.x = Math.sin(performance.now() * 0.001);
