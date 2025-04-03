@@ -112,8 +112,8 @@ class Loop {
   start() {
     this.renderer.setAnimationLoop(() => {
       this.update();
-      this.renderer.render(this.scene, this.camera);
-      // this.composer.render();
+      // this.renderer.render(this.scene, this.camera);
+      this.composer.render();
     });
   }
 

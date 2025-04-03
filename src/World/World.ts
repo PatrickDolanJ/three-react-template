@@ -6,6 +6,7 @@ import {
   DotScreenShader,
   RGBShiftShader,
   OutputPass,
+  RenderPixelatedPass,
 } from "three/examples/jsm/Addons.js";
 import { BasicCamera } from "./Components/PerspectiveCamera";
 import { BasicRenderer } from "./System/Renderer";
@@ -33,9 +34,15 @@ class World {
     this.camera = new BasicCamera(container);
     this.renderer = new BasicRenderer(container);
     this.composer = new EffectComposer(this.renderer);
+
     this.loop = new Loop(this.camera, this.scene, this.renderer, this.composer);
     this.orbitController = new OrbitController(this.camera, container);
-    this.resizer = new Resizer(container, this.camera, this.renderer);
+    this.resizer = new Resizer(
+      container,
+      this.camera,
+      this.renderer,
+      this.composer
+    );
 
     //Helpers
     const axesHelper = new AxesHelper(10);
@@ -49,20 +56,21 @@ class World {
     this.scene.add(starterCube);
 
     //Post Processing
+    // this.composer.addPass(new RenderPass(this.scene, this.camera));
+    // const effect1 = new ShaderPass(DotScreenShader);
+    // effect1.uniforms["scale"].value = 4.3;
+    // this.composer.addPass(effect1);
 
-    const composer = new EffectComposer(this.renderer);
-    composer.addPass(new RenderPass(this.scene, this.camera));
+    // const effect2 = new ShaderPass(RGBShiftShader);
+    // effect2.uniforms["amount"].value = 0.005;
+    // this.composer.addPass(effect2);
 
-    const effect1 = new ShaderPass(DotScreenShader);
-    effect1.uniforms["scale"].value = 4;
-    composer.addPass(effect1);
+    // const effect3 = new OutputPass();
+    // this.composer.addPass(effect3);
 
-    const effect2 = new ShaderPass(RGBShiftShader);
-    effect2.uniforms["amount"].value = 0.0015;
-    composer.addPass(effect2);
+    const effect4 = new RenderPixelatedPass(10, this.scene, this.camera);
 
-    const effect3 = new OutputPass();
-    composer.addPass(effect3);
+    this.composer.addPass(effect4);
   }
 
   start() {
