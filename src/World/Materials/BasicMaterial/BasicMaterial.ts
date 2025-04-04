@@ -1,9 +1,9 @@
 import { UniformsLib, UniformsUtils, ShaderMaterial } from "three";
-import basicVertShader from "../BasicShader/basicVertex.glsl";
-import basicFragShader from "../BasicShader/basicFragment.glsl";
+import basicVertShader from "./basicVertex.glsl";
+import basicFragShader from "./basicFragment.glsl";
 
 const uniforms = UniformsUtils.merge([UniformsLib["fog"]]);
-const BasicShaderMat = new ShaderMaterial({
+const BasicMat = new ShaderMaterial({
   uniforms: uniforms,
   defines: {},
   vertexShader: basicVertShader,
@@ -12,4 +12,4 @@ const BasicShaderMat = new ShaderMaterial({
   transparent: true,
 });
 
-export { BasicShaderMat };
+export { BasicMat };
