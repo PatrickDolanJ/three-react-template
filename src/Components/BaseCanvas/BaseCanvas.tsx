@@ -12,7 +12,7 @@ const BaseCanvas = () => {
         world.stop();
       };
     }
-  }, []);
+  }, [container]);
 
   return <div ref={container} id="mainCanvasContainer" />;
 };

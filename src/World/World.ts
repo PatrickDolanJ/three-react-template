@@ -1,11 +1,11 @@
 import { AxesHelper, Camera, Scene, WebGLRenderer } from "three";
 import {
   EffectComposer,
-  RenderPass,
   ShaderPass,
   DotScreenShader,
   RGBShiftShader,
   RenderPixelatedPass,
+  RenderPass,
 } from "three/examples/jsm/Addons.js";
 import { BasicCamera } from "./Components/PerspectiveCamera";
 import { BasicRenderer } from "./System/Renderer";
@@ -56,22 +56,20 @@ class World {
     this.scene.add(starterCube);
 
     //Post Processing
-    this.composer.addPass(new RenderPass(this.scene, this.camera));
+    // this.composer.addPass(new RenderPass(this.scene, this.camera));
 
-    const effect4 = new RenderPixelatedPass(10, this.scene, this.camera);
+    const effect4 = new RenderPixelatedPass(7, this.scene, this.camera);
     this.composer.addPass(effect4);
 
     const effect1 = new ShaderPass(DotScreenShader);
     effect1.uniforms["scale"].value = 4.3;
     this.composer.addPass(effect1);
-    console.log(effect1);
 
     const effect2 = new ShaderPass(RGBShiftShader);
-    effect2.uniforms["amount"].value = 0.005;
+    effect2.uniforms["amount"].value = 0.004;
     this.composer.addPass(effect2);
 
     const effectCustom = new BasicShaderPass();
-    console.log(effectCustom);
     this.composer.addPass(effectCustom);
   }
 
