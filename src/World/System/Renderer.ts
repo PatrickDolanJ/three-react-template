@@ -5,11 +5,17 @@ import {
   GammaCorrectionShader,
   // ShaderPass,
   // RGBShiftShader,
+  Pass,
   RenderPass,
   ShaderPass,
   // RenderPixelatedPass,
 } from "three/examples/jsm/Addons.js";
 import { BasicShaderPass } from "../PostProcessing/Basic/BasicPostProcessingShader";
+
+export const ShaderPassUniforms = {
+  tDiffuse: { value: null },
+  uTime: { value: 0.0 },
+};
 
 class Renderer extends THREE.WebGLRenderer {
   composer: EffectComposer;
@@ -47,6 +53,13 @@ class Renderer extends THREE.WebGLRenderer {
   }
 
   renderPostProcess() {
+    const delta = performance.now() / 1000;
+    // Manual Injection of current time
+    this.composer.passes.forEach((pass: Pass) => {
+      if (pass instanceof ShaderPass) {
+        pass.uniforms["uTime"] = { value: delta };
+      }
+    });
     this.composer.render();
   }
 }

@@ -1,6 +1,7 @@
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
 import basicFragment from "./basicFragment.glsl";
 import basicVertex from "./basicVertex.glsl";
+import { ShaderPassUniforms } from "../../System/Renderer";
 
 class BasicShaderPass extends ShaderPass {
   constructor() {
@@ -8,7 +9,7 @@ class BasicShaderPass extends ShaderPass {
       {
         fragmentShader: basicFragment,
         vertexShader: basicVertex,
-        uniforms: { tDiffuse: { value: null } },
+        uniforms: ShaderPassUniforms,
         name: "BasicShader",
       },
       "tDiffuse"
