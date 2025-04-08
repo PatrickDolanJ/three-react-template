@@ -1,23 +1,11 @@
-import {
-  Clock,
-  Scene,
-  Camera,
-  WebGLRenderer,
-  Vector2,
-  Raycaster,
-  PerspectiveCamera,
-  Object3D,
-  Intersection,
-  Object3DEventMap,
-  Layers as _LAYERS,
-} from "three";
-import { EffectComposer } from "three/examples/jsm/Addons.js";
+import * as THREE from "three";
 import { clamp } from "three/src/math/MathUtils.js";
+import { Renderer } from "./Renderer";
 
-const clock = new Clock();
-const mouse = new Vector2(1, 1);
-let hoverRaycaster: Raycaster;
-let clickRaycaster: Raycaster;
+const clock = new THREE.Clock();
+const mouse = new THREE.Vector2(1, 1);
+let hoverRaycaster: THREE.Raycaster;
+let clickRaycaster: THREE.Raycaster;
 
 export enum Layers {
   HOVER = 2,
@@ -30,21 +18,21 @@ export interface Updateable {
 }
 export interface Hoverable {
   onHover(data: IntersectionData): void;
-  layers: _LAYERS;
+  layers: THREE.Layers;
 }
 export interface Clickable {
   onClick(data: IntersectionData): void;
-  layers: _LAYERS;
+  layers: THREE.Layers;
 }
 
-export type IntersectionData = Omit<Intersection, "object">;
+export type IntersectionData = Omit<THREE.Intersection, "object">;
 
 function isHoverable(obj: unknown): obj is Hoverable {
   return (
     obj !== null &&
     typeof obj === "object" &&
     "onHover" in obj &&
-    typeof (obj as Hoverable).onHover === "function"
+    typeof obj.onHover === "function"
   );
 }
 
@@ -53,12 +41,12 @@ function isClickable(obj: unknown): obj is Clickable {
     obj !== null &&
     typeof obj === "object" &&
     "onClick" in obj &&
-    typeof (obj as Clickable).onClick === "function"
+    typeof obj.onClick === "function"
   );
 }
 
 function mapIntersections<T>(
-  intersections: Intersection<Object3D<Object3DEventMap>>[]
+  intersections: THREE.Intersection<THREE.Object3D<THREE.Object3DEventMap>>[]
 ) {
   return intersections.map((item) => {
     const { object, ...rest } = item;
@@ -68,19 +56,17 @@ function mapIntersections<T>(
 
 class Loop {
   private updatables: Updateable[] = [];
-  camera: Camera;
-  renderer: WebGLRenderer;
-  scene: Scene;
+  camera: THREE.Camera;
+  renderer: Renderer;
+  scene: THREE.Scene;
   maxInterval: number;
   fixedTimeInterval: number;
   isFixedTimeInterval: boolean;
-  composer: EffectComposer;
 
   constructor(
-    camera: PerspectiveCamera | Camera,
-    scene: Scene,
-    renderer: WebGLRenderer,
-    composer: EffectComposer,
+    camera: THREE.PerspectiveCamera | THREE.Camera,
+    scene: THREE.Scene,
+    renderer: Renderer,
     maxInterval: number = 0.01,
     fixedTimeInterval: number = 0.01,
     isFixedTimeInterval: boolean = false
@@ -88,17 +74,16 @@ class Loop {
     this.camera = camera;
     this.scene = scene;
     this.renderer = renderer;
-    this.composer = composer;
     this.maxInterval = maxInterval;
     this.fixedTimeInterval = fixedTimeInterval;
     this.isFixedTimeInterval = isFixedTimeInterval;
 
     //Layer for hoverables
-    hoverRaycaster = new Raycaster();
+    hoverRaycaster = new THREE.Raycaster();
     hoverRaycaster.layers.set(Layers.HOVER);
 
     //Layer for clickable
-    clickRaycaster = new Raycaster();
+    clickRaycaster = new THREE.Raycaster();
     clickRaycaster.layers.set(Layers.CLICK);
 
     document.addEventListener("mousemove", (event) => {
@@ -112,8 +97,7 @@ class Loop {
   start() {
     this.renderer.setAnimationLoop(() => {
       this.update();
-      // this.renderer.render(this.scene, this.camera);
-      this.composer.render();
+      this.renderer.renderPostProcess();
     });
   }
 
@@ -164,7 +148,11 @@ class Loop {
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
   }
 
-  private onHover(mouse: Vector2, camera: Camera, scene: Scene) {
+  private onHover(
+    mouse: THREE.Vector2,
+    camera: THREE.Camera,
+    scene: THREE.Scene
+  ) {
     hoverRaycaster.setFromCamera(mouse, camera);
     const intersection = hoverRaycaster
       .intersectObjects(scene.children)

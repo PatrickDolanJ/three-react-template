@@ -1,4 +1,4 @@
-import { Mesh, BoxGeometry } from "three";
+import * as THREE from "three";
 import { BasicMat } from "../Materials/BasicMaterial/BasicMaterial";
 import {
   Clickable,
@@ -7,7 +7,10 @@ import {
   Updateable,
 } from "../System/Loop";
 
-class StarterCube extends Mesh implements Hoverable, Clickable, Updateable {
+class StarterCube
+  extends THREE.Mesh
+  implements Hoverable, Clickable, Updateable
+{
   constructor(
     height: number = 5,
     width: number = 5,
@@ -16,7 +19,13 @@ class StarterCube extends Mesh implements Hoverable, Clickable, Updateable {
     heightSegments: number = 1
   ) {
     super(
-      new BoxGeometry(width, height, depth, widthSegments, heightSegments),
+      new THREE.BoxGeometry(
+        width,
+        height,
+        depth,
+        widthSegments,
+        heightSegments
+      ),
       BasicMat
     );
   }
