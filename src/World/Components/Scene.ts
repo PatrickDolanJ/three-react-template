@@ -1,14 +1,19 @@
-import { Color, Scene, Fog } from "three";
-class BasicScene extends Scene {
+import * as THREE from "three";
+class BasicScene extends THREE.Scene {
   constructor(
-    backgroundColor = new Color().setHex(0x24212b),
-    fogColor = new Color().setHex(0x24212b),
+    backgroundColor = new THREE.Color().setHex(
+      0x24212b,
+      THREE.LinearSRGBColorSpace
+    ),
+    fogColor = new THREE.Color().setHex(0x24212b),
     fogNear = 100,
     fogFar = 355
   ) {
     super();
     this.background = backgroundColor;
-    this.fog = new Fog(fogColor, fogNear, fogFar);
+    this.fog = new THREE.Fog(fogColor, fogNear, fogFar);
+    // Used for compatibility with Effect Composer
+    this.background.convertSRGBToLinear();
   }
 }
 

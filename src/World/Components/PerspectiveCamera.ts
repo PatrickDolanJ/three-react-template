@@ -1,5 +1,5 @@
-import { PerspectiveCamera } from "three";
-class BasicCamera extends PerspectiveCamera {
+import * as THREE from "three";
+class BasicCamera extends THREE.PerspectiveCamera {
   constructor(container: HTMLElement) {
     const fov = 35; // Field of View
     const aspect = container.clientWidth / container.clientHeight;
