@@ -11,21 +11,32 @@ export enum Layers {
   HOVER = 2,
   CLICK = 4,
 }
-
 export interface Updateable {
-  update(delta?: number): void | boolean;
+  update(delta?: number): void | boolean; //This is probably dum
   uuid: string;
 }
 export interface Hoverable {
-  onHover(data: IntersectionData): void;
+  onHover(data: HoverData): void;
   layers: THREE.Layers;
+  uuid: string;
 }
 export interface Clickable {
-  onClick(data: IntersectionData): void;
+  onClick(data: ClickData): void;
   layers: THREE.Layers;
+  uuid: string;
 }
 
-export type IntersectionData = Omit<THREE.Intersection, "object">;
+export type ClickData = Omit<THREE.Intersection, "object">;
+
+type HoverEvent = "ENTER" | "DURING" | "EXIT";
+export type HoverData = Omit<THREE.Intersection, "object"> & {
+  event: HoverEvent;
+};
+
+interface HoverStorage {
+  hoverable: Hoverable;
+  hoverData: HoverData;
+}
 
 function isHoverable(obj: unknown): obj is Hoverable {
   return (
@@ -56,6 +67,7 @@ function mapIntersections<T>(
 
 class Loop {
   private updatables: Updateable[] = [];
+  private hoverStorage: HoverStorage[] = [];
   camera: THREE.Camera;
   renderer: Renderer;
   scene: THREE.Scene;
@@ -139,7 +151,7 @@ class Loop {
     for (const object of this.updatables) {
       object.update(delta);
     }
-    this.onHover(mouse, this.camera, this.scene);
+    this.onHover();
   }
 
   private onMouseMove(event: MouseEvent) {
@@ -148,23 +160,50 @@ class Loop {
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
   }
 
-  private onHover(
-    mouse: THREE.Vector2,
-    camera: THREE.Camera,
-    scene: THREE.Scene
-  ) {
-    hoverRaycaster.setFromCamera(mouse, camera);
+  private onHover() {
+    hoverRaycaster.setFromCamera(mouse, this.camera);
+
     const intersection = hoverRaycaster
-      .intersectObjects(scene.children)
-      .filter((item) => {
-        return isHoverable(item.object);
-      });
+      .intersectObjects(this.scene.children)
+      .filter((item) => isHoverable(item.object));
+
     const hoverables = mapIntersections<Hoverable>(intersection);
     if (hoverables.length > 0) {
       hoverables.forEach((item) => {
-        item.object.onHover(item.data);
+        let event: HoverEvent = "ENTER";
+
+        if (
+          this.hoverStorage.some(
+            (obj) => obj.hoverable.uuid === item.object.uuid
+          )
+        ) {
+          event = "DURING";
+        }
+        const data: HoverData = { ...item.data, event: event };
+
+        if (
+          !this.hoverStorage.some(
+            (obj) => obj.hoverable.uuid === item.object.uuid
+          )
+        ) {
+          this.hoverStorage.push({
+            hoverable: item.object,
+            hoverData: { ...data },
+          });
+        }
+        item.object.onHover(data);
       });
     }
+
+    this.hoverStorage.forEach((item) => {
+      if (!hoverables.some((obj) => obj.object.uuid === item.hoverable.uuid)) {
+        item.hoverData.event = "EXIT";
+        item.hoverable.onHover(item.hoverData);
+        this.hoverStorage = this.hoverStorage.filter(
+          (obj) => obj.hoverable.uuid !== item.hoverable.uuid
+        );
+      }
+    });
   }
 
   private onClick() {

@@ -33,10 +33,11 @@ class World {
     this.scene.add(axesHelper);
 
     // Basic Mesh with custom shader
-    const starterCube = new StarterCube(5, 5, 1);
+    const starterCube = new StarterCube(5, 5, 5);
     starterCube.position.set(0, 0, 0);
     this.loop.addClickable(starterCube);
     this.loop.addUpdateable(starterCube);
+    this.loop.addHoverable(starterCube);
     this.scene.add(starterCube);
   }
 

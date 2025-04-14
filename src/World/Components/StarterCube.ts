@@ -3,18 +3,22 @@ import { BasicMat } from "../Materials/BasicMaterial/BasicMaterial";
 import {
   Clickable,
   Hoverable,
-  IntersectionData,
+  ClickData,
+  HoverData,
   Updateable,
 } from "../System/Loop";
+import gsap from "gsap";
 
 class StarterCube
   extends THREE.Mesh
   implements Hoverable, Clickable, Updateable
 {
+  hoverAniation = gsap.timeline();
+
   constructor(
-    height: number = 5,
     width: number = 5,
-    depth: number = 1,
+    height: number = 5,
+    depth: number = 5,
     widthSegments: number = 1,
     heightSegments: number = 1
   ) {
@@ -30,11 +34,25 @@ class StarterCube
     );
   }
 
-  onHover(data: IntersectionData) {
-    console.log("Distance to Startercube (HOVER): " + data.distance);
+  onHover(data: HoverData) {
+    if (data.event === "ENTER") {
+      this.hoverAniation.to(this.scale, {
+        x: 1.05,
+        y: 1.05,
+        z: 1.05,
+        duration: 0.1,
+      });
+    } else if (data.event === "EXIT") {
+      this.hoverAniation.to(this.scale, {
+        x: 1.0,
+        y: 1.0,
+        z: 1.0,
+        duration: 0.1,
+      });
+    }
   }
 
-  onClick(data: IntersectionData) {
+  onClick(data: ClickData) {
     console.log("Distance to Startercube (CLICK): " + data.distance);
   }
   update() {
