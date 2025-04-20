@@ -7,22 +7,16 @@ const mouse = new THREE.Vector2(1, 1);
 let hoverRaycaster: THREE.Raycaster;
 let clickRaycaster: THREE.Raycaster;
 
-export enum Layers {
-  HOVER = 2,
-  CLICK = 4,
-}
 export interface Updateable {
   update(delta?: number): void | boolean; //This is probably dum
   uuid: string;
 }
 export interface Hoverable {
   onHover(data: HoverData): void;
-  layers: THREE.Layers;
   uuid: string;
 }
 export interface Clickable {
   onClick(data: ClickData): void;
-  layers: THREE.Layers;
   uuid: string;
 }
 
@@ -92,11 +86,11 @@ class Loop {
 
     //Layer for hoverables
     hoverRaycaster = new THREE.Raycaster();
-    hoverRaycaster.layers.set(Layers.HOVER);
+    // hoverRaycaster.layers.set(Layers.HOVER);
 
     //Layer for clickable
     clickRaycaster = new THREE.Raycaster();
-    clickRaycaster.layers.set(Layers.CLICK);
+    // clickRaycaster.layers.set(Layers.CLICK);
 
     document.addEventListener("mousemove", (event) => {
       this.onMouseMove(event);
@@ -109,7 +103,8 @@ class Loop {
   start() {
     this.renderer.setAnimationLoop(() => {
       this.update();
-      this.renderer.renderPostProcess();
+      this.renderer.render(this.scene, this.camera);
+      // this.renderer.renderPostProcess();
     });
   }
 
@@ -125,21 +120,21 @@ class Loop {
     this.updatables = this.updatables.filter((item) => item.uuid != obj.uuid);
   }
 
-  addHoverable(obj: Hoverable) {
-    obj.layers.enable(Layers.HOVER);
-  }
+  // addHoverable(obj: Hoverable) {
+  //   obj.layers.enable(Layers.HOVER);
+  // }
 
-  removeHoverable(obj: Hoverable) {
-    obj.layers.disable(Layers.HOVER);
-  }
+  // removeHoverable(obj: Hoverable) {
+  //   obj.layers.disable(Layers.HOVER);
+  // }
 
-  addClickable(obj: Clickable) {
-    obj.layers.enable(Layers.CLICK);
-  }
+  // addClickable(obj: Clickable) {
+  //   obj.layers.enable(Layers.CLICK);
+  // }
 
-  removeClickable(obj: Clickable) {
-    obj.layers.disable(Layers.CLICK);
-  }
+  // removeClickable(obj: Clickable) {
+  //   obj.layers.disable(Layers.CLICK);
+  // }
 
   private update() {
     const clockDelta = clock.getDelta();
@@ -208,16 +203,14 @@ class Loop {
 
   private onClick() {
     clickRaycaster.setFromCamera(mouse, this.camera);
-    const intersection = clickRaycaster
-      .intersectObjects(this.scene.children)
-      .filter((item) => {
-        return isClickable(item.object);
-      });
-    const clickables = mapIntersections<Clickable>(intersection);
-    if (clickables.length > 0) {
-      clickables.forEach((item) => {
-        item.object.onClick(item.data);
-      });
+    const intersection = clickRaycaster.intersectObjects(this.scene.children);
+    if (intersection.length == 0 || !isClickable(intersection[0].object)) {
+      return;
+    } else {
+      const clickables = mapIntersections<Clickable>(
+        intersection.filter((item) => isClickable(item.object))
+      );
+      clickables[0].object.onClick(clickables[0].data);
     }
   }
 }

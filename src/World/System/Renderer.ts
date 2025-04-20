@@ -1,13 +1,13 @@
 import * as THREE from "three";
 import {
-  // DotScreenShader,
+  DotScreenShader,
   EffectComposer,
   GammaCorrectionShader,
   ShaderPass,
-  // RGBShiftShader,
+  RGBShiftShader,
   Pass,
   RenderPass,
-  // ShaderPass,
+  ShaderPass,
   RenderPixelatedPass,
 } from "three/examples/jsm/Addons.js";
 import { BasicShaderPass } from "../PostProcessing/Basic/BasicPostProcessingShader";
@@ -30,12 +30,13 @@ class Renderer extends THREE.WebGLRenderer {
     this.toneMapping = THREE.NoToneMapping;
     container.append(this.domElement);
     this.composer = new EffectComposer(this);
+    this.shadowMap.enabled = true;
 
     //Post Processing
     this.composer.addPass(new RenderPass(scene, camera));
 
-    const pixelPass = new RenderPixelatedPass(10, scene, camera);
-    this.composer.addPass(pixelPass);
+    // const pixelPass = new RenderPixelatedPass(10, scene, camera);
+    // this.composer.addPass(pixelPass);
 
     //Gamme Correct is needed to maintain scene background, color among other things, with Effect Composer
     // Needs to be after the render passes
@@ -50,8 +51,8 @@ class Renderer extends THREE.WebGLRenderer {
     // chromaticAbPass.uniforms["amount"].value = 0.004;
     // this.composer.addPass(chromaticAbPass);
 
-    const basicPass = new BasicShaderPass();
-    this.composer.addPass(basicPass);
+    // const basicPass = new BasicShaderPass();
+    // this.composer.addPass(basicPass);
   }
 
   renderPostProcess() {

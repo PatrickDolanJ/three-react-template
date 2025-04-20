@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import gsap from "gsap";
 import { BasicMat } from "../Materials/BasicMaterial/BasicMaterial";
 import {
   Clickable,
@@ -7,14 +8,11 @@ import {
   HoverData,
   Updateable,
 } from "../System/Loop";
-import gsap from "gsap";
 
 class StarterCube
   extends THREE.Mesh
   implements Hoverable, Clickable, Updateable
 {
-  hoverAniation = gsap.timeline();
-
   constructor(
     width: number = 5,
     height: number = 5,
@@ -35,20 +33,21 @@ class StarterCube
   }
 
   onHover(data: HoverData) {
+    const tl = gsap.timeline();
     if (data.event === "ENTER") {
-      this.hoverAniation.to(this.scale, {
+      tl.to(this.scale, {
         x: 1.05,
         y: 1.05,
         z: 1.05,
         duration: 0.1,
       });
     } else if (data.event === "EXIT") {
-      this.hoverAniation.to(this.scale, {
+      tl.to(this.scale, {
         x: 1.0,
         y: 1.0,
         z: 1.0,
         duration: 0.1,
-      });
+      }).then(() => tl.kill());
     }
   }
 
@@ -56,7 +55,7 @@ class StarterCube
     console.log("Distance to Startercube (CLICK): " + data.distance);
   }
   update() {
-    this.position.x = Math.sin(performance.now() * 0.001);
+    this.position.x = Math.sin(performance.now() * 0.002);
   }
 }
 
