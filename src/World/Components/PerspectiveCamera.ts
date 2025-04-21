@@ -9,7 +9,7 @@ class BasicCamera extends THREE.PerspectiveCamera {
     super(fov, aspect, near, far);
 
     // move the camera back so we can view the scene
-    this.position.set(0, 0, 50);
+    this.position.set(40, 40, 40);
   }
 }
 

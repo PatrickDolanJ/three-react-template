@@ -7,22 +7,16 @@ const mouse = new THREE.Vector2(1, 1);
 let hoverRaycaster: THREE.Raycaster;
 let clickRaycaster: THREE.Raycaster;
 
-export enum Layers {
-  HOVER = 2,
-  CLICK = 4,
-}
 export interface Updateable {
   update(delta?: number): void | boolean; //This is probably dum
   uuid: string;
 }
 export interface Hoverable {
   onHover(data: HoverData): void;
-  layers: THREE.Layers;
   uuid: string;
 }
 export interface Clickable {
   onClick(data: ClickData): void;
-  layers: THREE.Layers;
   uuid: string;
 }
 
@@ -56,13 +50,11 @@ function isClickable(obj: unknown): obj is Clickable {
   );
 }
 
-function mapIntersections<T>(
-  intersections: THREE.Intersection<THREE.Object3D<THREE.Object3DEventMap>>[]
+function mapIntersection<T>(
+  intersection: THREE.Intersection<THREE.Object3D<THREE.Object3DEventMap>>
 ) {
-  return intersections.map((item) => {
-    const { object, ...rest } = item;
-    return { object: object as T, data: rest };
-  });
+  const { object, ...rest } = intersection;
+  return { object: object as T, data: rest };
 }
 
 class Loop {
@@ -90,13 +82,8 @@ class Loop {
     this.fixedTimeInterval = fixedTimeInterval;
     this.isFixedTimeInterval = isFixedTimeInterval;
 
-    //Layer for hoverables
     hoverRaycaster = new THREE.Raycaster();
-    hoverRaycaster.layers.set(Layers.HOVER);
-
-    //Layer for clickable
     clickRaycaster = new THREE.Raycaster();
-    clickRaycaster.layers.set(Layers.CLICK);
 
     document.addEventListener("mousemove", (event) => {
       this.onMouseMove(event);
@@ -125,22 +112,6 @@ class Loop {
     this.updatables = this.updatables.filter((item) => item.uuid != obj.uuid);
   }
 
-  addHoverable(obj: Hoverable) {
-    obj.layers.enable(Layers.HOVER);
-  }
-
-  removeHoverable(obj: Hoverable) {
-    obj.layers.disable(Layers.HOVER);
-  }
-
-  addClickable(obj: Clickable) {
-    obj.layers.enable(Layers.CLICK);
-  }
-
-  removeClickable(obj: Clickable) {
-    obj.layers.disable(Layers.CLICK);
-  }
-
   private update() {
     const clockDelta = clock.getDelta();
     let delta = clamp(clockDelta, 0, this.maxInterval);
@@ -163,40 +134,59 @@ class Loop {
   private onHover() {
     hoverRaycaster.setFromCamera(mouse, this.camera);
 
-    const intersection = hoverRaycaster
-      .intersectObjects(this.scene.children)
-      .filter((item) => isHoverable(item.object));
-
-    const hoverables = mapIntersections<Hoverable>(intersection);
-    if (hoverables.length > 0) {
-      hoverables.forEach((item) => {
-        let event: HoverEvent = "ENTER";
-
-        if (
-          this.hoverStorage.some(
-            (obj) => obj.hoverable.uuid === item.object.uuid
-          )
-        ) {
-          event = "DURING";
-        }
-        const data: HoverData = { ...item.data, event: event };
-
-        if (
-          !this.hoverStorage.some(
-            (obj) => obj.hoverable.uuid === item.object.uuid
-          )
-        ) {
-          this.hoverStorage.push({
-            hoverable: item.object,
-            hoverData: { ...data },
-          });
-        }
-        item.object.onHover(data);
-      });
+    const intersections = hoverRaycaster.intersectObjects(this.scene.children);
+    if (intersections.length === 0 && this.hoverStorage.length === 0) {
+      return;
     }
 
+    this.processNewHover(intersections);
+    this.processExitHovers(intersections);
+  }
+
+  private onClick() {
+    clickRaycaster.setFromCamera(mouse, this.camera);
+    const intersection = clickRaycaster.intersectObjects(this.scene.children);
+    if (intersection.length == 0 || !isClickable(intersection[0].object)) {
+      return;
+    } else {
+      const clickable = mapIntersection<Clickable>(intersection[0]);
+      clickable.object.onClick(clickable.data);
+    }
+  }
+
+  private processNewHover(intersections: THREE.Intersection[]) {
+    if (intersections.length > 0 && isHoverable(intersections[0].object)) {
+      const curHover = mapIntersection<Hoverable>(intersections[0]);
+      let event: HoverEvent = "ENTER";
+
+      if (
+        this.hoverStorage.some(
+          (obj) => obj.hoverable.uuid === curHover.object.uuid
+        )
+      ) {
+        event = "DURING";
+      }
+      const data: HoverData = { ...curHover.data, event: event };
+
+      if (
+        !this.hoverStorage.some(
+          (obj) => obj.hoverable.uuid === curHover.object.uuid
+        )
+      ) {
+        this.hoverStorage.push({
+          hoverable: curHover.object,
+          hoverData: { ...data },
+        });
+      }
+      curHover.object.onHover(data);
+    }
+  }
+  private processExitHovers(intersections: THREE.Intersection[]) {
     this.hoverStorage.forEach((item) => {
-      if (!hoverables.some((obj) => obj.object.uuid === item.hoverable.uuid)) {
+      if (
+        isHoverable(intersections[0].object) ||
+        intersections[0].object.uuid !== item.hoverable.uuid
+      ) {
         item.hoverData.event = "EXIT";
         item.hoverable.onHover(item.hoverData);
         this.hoverStorage = this.hoverStorage.filter(
@@ -204,21 +194,6 @@ class Loop {
         );
       }
     });
-  }
-
-  private onClick() {
-    clickRaycaster.setFromCamera(mouse, this.camera);
-    const intersection = clickRaycaster
-      .intersectObjects(this.scene.children)
-      .filter((item) => {
-        return isClickable(item.object);
-      });
-    const clickables = mapIntersections<Clickable>(intersection);
-    if (clickables.length > 0) {
-      clickables.forEach((item) => {
-        item.object.onClick(item.data);
-      });
-    }
   }
 }
 
