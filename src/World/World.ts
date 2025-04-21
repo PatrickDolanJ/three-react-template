@@ -4,7 +4,6 @@ import { Renderer } from "./System/Renderer";
 import { BasicScene } from "./Components/Scene";
 import { Loop } from "./System/Loop";
 import { OrbitController } from "./Components/OrbitController";
-import { OrbitControls } from "three/examples/jsm/Addons.js";
 import { Resizer } from "./System/Resizer";
 import { StarterCube } from "./Components/StarterCube";
 
@@ -15,7 +14,7 @@ class World {
   camera: THREE.Camera;
   renderer: Renderer;
   loop: Loop;
-  orbitController?: OrbitControls;
+  orbitController?: OrbitController;
   resizer: Resizer;
 
   constructor(container: HTMLElement) {
@@ -31,7 +30,6 @@ class World {
     //basic Mesh with custom shader
     const starterCube = new StarterCube(5, 5, 5);
     starterCube.position.set(0, 0, 0);
-    // starterCube.material = new THREE.MeshPhongMaterial();
     starterCube.castShadow = true;
     starterCube.receiveShadow = true;
     this.loop.addUpdateable(starterCube);
@@ -55,7 +53,6 @@ class World {
     //Ground Plane
     const groundPlane = new THREE.Mesh(
       new THREE.BoxGeometry(20, 0.2, 20),
-      // new THREE.MeshPhongMaterial()
       new THREE.MeshPhongMaterial()
     );
     groundPlane.position.set(0, -5, 0);

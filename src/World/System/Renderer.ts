@@ -1,21 +1,16 @@
 import * as THREE from "three";
 import {
-  DotScreenShader,
+  // DotScreenShader,
   EffectComposer,
   GammaCorrectionShader,
   ShaderPass,
-  RGBShiftShader,
+  // RGBShiftShader,
   Pass,
   RenderPass,
-  ShaderPass,
-  RenderPixelatedPass,
+  // ShaderPass,
+  // RenderPixelatedPass,
 } from "three/examples/jsm/Addons.js";
-import { BasicShaderPass } from "../PostProcessing/Basic/BasicPostProcessingShader";
-
-export const ShaderPassUniforms = {
-  tDiffuse: { value: null },
-  uTime: { value: 0.0 },
-};
+// import { BasicShaderPass } from "../PostProcessing/Basic/BasicPostProcessingShader";
 
 class Renderer extends THREE.WebGLRenderer {
   composer: EffectComposer;
