@@ -7,6 +7,8 @@ import { OrbitController } from "./Components/OrbitController";
 import { Resizer } from "./System/Resizer";
 import { StarterCube } from "./Components/StarterCube";
 
+import { BasicMat } from "./Materials/BasicMaterial/BasicMaterial";
+
 //----------------------Settings---------------------
 
 class World {
@@ -28,14 +30,14 @@ class World {
     this.resizer = new Resizer(container, this.camera, this.renderer);
 
     //basic Mesh with custom shader
-    const starterCube = new StarterCube(5, 5, 5);
+    const starterCube = new StarterCube(5, 5, 5, BasicMat);
     starterCube.position.set(0, 0, 0);
     starterCube.castShadow = true;
     starterCube.receiveShadow = true;
     this.loop.addUpdateable(starterCube);
     this.scene.add(starterCube);
 
-    //lights
+    // lights;
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     this.scene.add(ambientLight);
 

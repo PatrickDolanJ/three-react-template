@@ -1,9 +1,19 @@
-import { defineConfig } from "vite";
+import { defineConfig, Plugin } from "vite";
 import glsl from "vite-plugin-glsl";
 import react from "@vitejs/plugin-react";
 // https://vitejs.dev/config/
+
+const fullReloadAlways: Plugin = {
+  name: "full-reload",
+  handleHotUpdate({ server }) {
+    server.hot.send({ type: "full-reload" });
+    return [];
+  },
+};
+
 export default defineConfig({
   plugins: [
+    fullReloadAlways,
     react(),
     glsl({
       include: [

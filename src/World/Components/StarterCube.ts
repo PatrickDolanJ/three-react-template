@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import gsap from "gsap";
-import { BasicMat } from "../Materials/BasicMaterial/BasicMaterial";
 import {
   Clickable,
   Hoverable,
@@ -17,6 +16,9 @@ class StarterCube
     width: number = 5,
     height: number = 5,
     depth: number = 5,
+    material: THREE.Material = new THREE.MeshPhongMaterial({
+      color: new THREE.Color(0.88, 0.1, 0.8),
+    }),
     widthSegments: number = 1,
     heightSegments: number = 1
   ) {
@@ -28,7 +30,7 @@ class StarterCube
         widthSegments,
         heightSegments
       ),
-      BasicMat
+      material
     );
   }
 
